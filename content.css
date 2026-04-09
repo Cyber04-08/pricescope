@@ -1,0 +1,128 @@
+/* PriceScope — injected styles for Amazon product pages */
+
+#pricescope-container {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 16px;
+  margin: 16px 0;
+  font-family: inherit;
+  max-width: 700px;
+  box-sizing: border-box;
+}
+
+#pricescope-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 8px;
+  margin-bottom: 12px;
+}
+
+#pricescope-title {
+  font-weight: bold;
+  font-size: 16px;
+  color: #0f1111;
+}
+
+#pricescope-status {
+  font-size: 14px;
+  color: #565959;
+}
+
+#pricescope-chart-wrapper {
+  height: 200px;
+  margin-bottom: 12px;
+}
+
+#pricescope-chart-wrapper canvas {
+  max-height: 200px;
+}
+
+#pricescope-verdict {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 12px;
+  background: #f7f7f7;
+  border-radius: 4px;
+}
+
+#pricescope-score-badge {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+#pricescope-score-badge.score-low {
+  background: #c40000;
+  color: #fff;
+}
+
+#pricescope-score-badge.score-mid {
+  background: #e47911;
+  color: #fff;
+}
+
+#pricescope-score-badge.score-high {
+  background: #007600;
+  color: #fff;
+}
+
+#pricescope-verdict-text {
+  font-weight: bold;
+  font-size: 15px;
+  margin-bottom: 4px;
+}
+
+#pricescope-reason {
+  font-size: 13px;
+  color: #565959;
+  line-height: 1.5;
+}
+
+#pricescope-loading {
+  font-size: 13px;
+  color: #565959;
+  padding: 8px 0;
+}
+
+#pricescope-no-key-msg {
+  font-size: 13px;
+  color: #565959;
+  margin: 0;
+  padding: 8px 0;
+}
+
+#pricescope-no-key-msg a {
+  color: #007185;
+  text-decoration: none;
+}
+
+#pricescope-no-key-msg a:hover {
+  text-decoration: underline;
+}
+
+#pricescope-footer {
+  font-size: 11px;
+  color: #999;
+  margin-top: 10px;
+  display: flex;
+  justify-content: space-between;
+}
+
+#pricescope-settings-link {
+  color: #999;
+  text-decoration: none;
+}
+
+#pricescope-settings-link:hover {
+  text-decoration: underline;
+}
