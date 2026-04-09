@@ -1,0 +1,122 @@
+/* PriceScope Popup Styles */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  width: 320px;
+  min-height: 160px;
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 14px;
+}
+
+#popup-header {
+  background: #0f1111;
+  color: #fff;
+  padding: 10px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  font-weight: bold;
+  font-size: 15px;
+}
+
+#open-settings {
+  color: #fff;
+  text-decoration: none;
+  font-size: 16px;
+  line-height: 1;
+}
+
+#popup-body {
+  padding: 14px;
+}
+
+#popup-body p {
+  color: #555;
+  line-height: 1.5;
+  margin-bottom: 10px;
+}
+
+#popup-asin {
+  font-size: 11px;
+  color: #999;
+  margin-bottom: 4px;
+}
+
+#popup-price {
+  font-size: 15px;
+  font-weight: bold;
+  color: #0f1111;
+  margin-bottom: 4px;
+}
+
+#popup-score-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 10px 0;
+}
+
+#popup-score-badge {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+#popup-score-badge.score-low {
+  background: #c40000;
+  color: #fff;
+}
+
+#popup-score-badge.score-mid {
+  background: #e47911;
+  color: #fff;
+}
+
+#popup-score-badge.score-high {
+  background: #007600;
+  color: #fff;
+}
+
+#popup-verdict-text {
+  font-weight: bold;
+  font-size: 14px;
+  color: #0f1111;
+}
+
+#popup-reason {
+  font-size: 12px;
+  color: #555;
+  line-height: 1.5;
+}
+
+button {
+  padding: 8px 14px;
+  background: #e47911;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+button:hover {
+  background: #c96c0a;
+}
+
+.hidden {
+  display: none;
+}

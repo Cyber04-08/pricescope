@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>PriceScope</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div id="popup-header">
+    <span class="logo">📊 PriceScope</span>
+    <a href="#" id="open-settings" title="Settings">⚙️</a>
+  </div>
+  <div id="popup-body">
+    <div id="no-data-state" class="hidden">
+      <p>Visit an Amazon product page to see price analysis.</p>
+    </div>
+    <div id="no-keys-state" class="hidden">
+      <p>Add your API keys in Settings to get started.</p>
+      <button id="open-settings-btn">Open Settings</button>
+    </div>
+    <div id="data-state" class="hidden">
+      <div id="popup-asin"></div>
+      <div id="popup-price"></div>
+      <div id="popup-score-row">
+        <div id="popup-score-badge"></div>
+        <div id="popup-verdict-text"></div>
+      </div>
+      <div id="popup-reason"></div>
+    </div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>
