@@ -91,7 +91,6 @@
   settingsLink.textContent = 'Settings';
   settingsLink.addEventListener('click', (e) => {
     e.preventDefault();
-    chrome.runtime.sendMessage({ type: '__OPEN_OPTIONS__' });
     window.open(chrome.runtime.getURL('options.html'), '_blank');
   });
 
