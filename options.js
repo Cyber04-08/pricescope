@@ -80,7 +80,7 @@ document.getElementById('test-claude').addEventListener('click', async () => {
         'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify({
-        model: 'claude-haiku-4-5',
+        model: 'claude-haiku-4-5-20251001',
         max_tokens: 10,
         messages: [{ role: 'user', content: 'Reply with the single word: ok' }]
       })
@@ -93,7 +93,7 @@ document.getElementById('test-claude').addEventListener('click', async () => {
       claudeStatus.textContent = '✗ Invalid key or network error';
       claudeStatus.style.color = '#c40000';
     }
-  } catch {
+  } catch (err) {
     claudeStatus.textContent = '✗ Invalid key or network error';
     claudeStatus.style.color = '#c40000';
   }

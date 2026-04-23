@@ -5,10 +5,26 @@
   // ─── Step 1: Extract ASIN ──────────────────────────────────────────────────
 
   function extractASIN() {
-    const urlMatch = window.location.pathname.match(/\/dp\/([A-Z0-9]{10})/);
-    if (urlMatch) return urlMatch[1];
+    const path = window.location.pathname;
+    const patterns = [
+      /\/dp\/([A-Z0-9]{10})/,
+      /\/gp\/product\/([A-Z0-9]{10})/,
+      /\/gp\/aw\/d\/([A-Z0-9]{10})/
+    ];
+
+    for (const pattern of patterns) {
+      const match = path.match(pattern);
+      if (match) return match[1];
+    }
+
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('ASIN')) {
+      const asin = urlParams.get('ASIN');
+      if (asin && /^[A-Z0-9]{10}$/.test(asin)) return asin;
+    }
+
     const asinInput = document.getElementById('ASIN');
-    if (asinInput) return asinInput.value;
+    if (asinInput && /^[A-Z0-9]{10}$/.test(asinInput.value)) return asinInput.value;
     return null;
   }
 
@@ -104,20 +120,7 @@
 
   anchor.insertAdjacentElement('afterend', container);
 
-  // ─── Step 4: Load Chart.js dynamically ────────────────────────────────────
-
-  async function loadChartJS() {
-    if (window.Chart) return;
-    return new Promise((resolve, reject) => {
-      const script = document.createElement('script');
-      script.src = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js';
-      script.onload = resolve;
-      script.onerror = reject;
-      document.head.appendChild(script);
-    });
-  }
-
-  // ─── Step 5: Fetch price data ─────────────────────────────────────────────
+  // ─── Step 4: Fetch price data ─────────────────────────────────────────────
 
   let chartData = null;
 
@@ -144,18 +147,35 @@
   }
 
   chartData = priceResult.chartData;
+
+  // FIX: Guard against empty prices array (critical bug fix)
+  if (!chartData.prices || chartData.prices.length === 0) {
+    status.textContent = 'No price data available.';
+    chartWrapper.style.display = 'none';
+    verdictWrapper.innerHTML = '<p id="pricescope-no-key-msg">This product has no price history in the last 90 days.</p>';
+    return;
+  }
+
   const currentPrice = chartData.prices[chartData.prices.length - 1];
   status.textContent = `Current Price: $${currentPrice.toFixed(2)}`;
 
   // Render chart
   try {
-    await loadChartJS();
     renderChart(chartData);
-  } catch {
+  } catch (err) {
+    console.error('Chart rendering failed:', err);
     chartWrapper.style.display = 'none';
   }
 
-  // ─── Step 6: Fetch AI verdict ──────────────────────────────────────────────
+  // ─── Step 5: Fetch AI verdict (use cached if available) ──────────────────────
+
+  if (priceResult.cachedVerdict) {
+    renderVerdict(priceResult.cachedVerdict);
+    await chrome.storage.local.set({
+      currentPageData: { asin, currentPrice, verdict: priceResult.cachedVerdict, timestamp: Date.now() }
+    });
+    return;
+  }
 
   verdictWrapper.innerHTML = '<div id="pricescope-loading">Analyzing deal...</div>';
 
@@ -181,7 +201,7 @@
   const { verdict } = verdictResult;
   renderVerdict(verdict);
 
-  // ─── Step 7: Store result for popup ───────────────────────────────────────
+  // ─── Step 6: Store result for popup ───────────────────────────────────────
 
   await chrome.storage.local.set({
     currentPageData: {
@@ -195,37 +215,49 @@
   // ─── Chart renderer ───────────────────────────────────────────────────────
 
   function renderChart(data) {
-    new window.Chart(document.getElementById('pricescope-chart'), {
-      type: 'line',
-      data: {
-        labels: data.labels,
-        datasets: [{
-          label: 'Price (USD)',
-          data: data.prices,
-          borderColor: '#e47911',
-          backgroundColor: 'rgba(228, 121, 17, 0.08)',
-          tension: 0.3,
-          pointRadius: 2,
-          fill: true
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: { display: false },
-          tooltip: {
-            callbacks: {
-              label: ctx => `$${ctx.parsed.y.toFixed(2)}`
+    // FIX: Guard against missing Chart.js (critical bug fix)
+    if (!window.Chart) {
+      console.error('Chart.js library not loaded');
+      chartWrapper.innerHTML = '<p style="color: #c40000;">Chart library failed to load. Please refresh the page.</p>';
+      return;
+    }
+
+    try {
+      new window.Chart(document.getElementById('pricescope-chart'), {
+        type: 'line',
+        data: {
+          labels: data.labels,
+          datasets: [{
+            label: 'Price (USD)',
+            data: data.prices,
+            borderColor: '#e47911',
+            backgroundColor: 'rgba(228, 121, 17, 0.08)',
+            tension: 0.3,
+            pointRadius: 2,
+            fill: true
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: ctx => `$${ctx.parsed.y.toFixed(2)}`
+              }
+            }
+          },
+          scales: {
+            y: {
+              ticks: { callback: val => `$${val.toFixed(2)}` }
             }
           }
-        },
-        scales: {
-          y: {
-            ticks: { callback: val => `$${val.toFixed(2)}` }
-          }
         }
-      }
-    });
+      });
+    } catch (err) {
+      console.error('Chart creation failed:', err);
+      chartWrapper.innerHTML = '<p style="color: #c40000;">Failed to render chart. Please refresh the page.</p>';
+    }
   }
 
   // ─── Verdict renderer ─────────────────────────────────────────────────────

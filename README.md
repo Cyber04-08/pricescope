@@ -86,6 +86,7 @@ User visits amazon.com/dp/ASIN
 ## Limitations / Known Issues
 
 - Only supports **amazon.com** (US) in v1.0 — `.co.uk`, `.ca`, `.de`, etc. are not matched by the content script
+- Supports multiple Amazon product URL patterns including `/dp/`, `/gp/product/`, and mobile `/gp/aw/d/`
 - Price history is limited to the **last 90 days** of Keepa data
 - Keepa's free tier has rate limits; PriceScope caches results for **24 hours** per ASIN to minimize API calls
 - Chart.js is loaded from CDN on first use — requires an internet connection and may take a moment on slow connections
