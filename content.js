@@ -5,10 +5,26 @@
   // ─── Step 1: Extract ASIN ──────────────────────────────────────────────────
 
   function extractASIN() {
-    const urlMatch = window.location.pathname.match(/\/dp\/([A-Z0-9]{10})/);
-    if (urlMatch) return urlMatch[1];
+    const path = window.location.pathname;
+    const patterns = [
+      /\/dp\/([A-Z0-9]{10})/,
+      /\/gp\/product\/([A-Z0-9]{10})/,
+      /\/gp\/aw\/d\/([A-Z0-9]{10})/
+    ];
+
+    for (const pattern of patterns) {
+      const match = path.match(pattern);
+      if (match) return match[1];
+    }
+
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('ASIN')) {
+      const asin = urlParams.get('ASIN');
+      if (asin && /^[A-Z0-9]{10}$/.test(asin)) return asin;
+    }
+
     const asinInput = document.getElementById('ASIN');
-    if (asinInput) return asinInput.value;
+    if (asinInput && /^[A-Z0-9]{10}$/.test(asinInput.value)) return asinInput.value;
     return null;
   }
 
@@ -104,20 +120,7 @@
 
   anchor.insertAdjacentElement('afterend', container);
 
-  // ─── Step 4: Load Chart.js dynamically ────────────────────────────────────
-
-  async function loadChartJS() {
-    if (window.Chart) return;
-    return new Promise((resolve, reject) => {
-      const script = document.createElement('script');
-      script.src = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js';
-      script.onload = resolve;
-      script.onerror = reject;
-      document.head.appendChild(script);
-    });
-  }
-
-  // ─── Step 5: Fetch price data ─────────────────────────────────────────────
+  // ─── Step 4: Fetch price data ─────────────────────────────────────────────
 
   let chartData = null;
 
@@ -149,13 +152,20 @@
 
   // Render chart
   try {
-    await loadChartJS();
     renderChart(chartData);
   } catch {
     chartWrapper.style.display = 'none';
   }
 
-  // ─── Step 6: Fetch AI verdict ──────────────────────────────────────────────
+  // ─── Step 5: Fetch AI verdict (use cached if available) ──────────────────────
+
+  if (priceResult.cachedVerdict) {
+    renderVerdict(priceResult.cachedVerdict);
+    await chrome.storage.local.set({
+      currentPageData: { asin, currentPrice, verdict: priceResult.cachedVerdict, timestamp: Date.now() }
+    });
+    return;
+  }
 
   verdictWrapper.innerHTML = '<div id="pricescope-loading">Analyzing deal...</div>';
 
@@ -181,7 +191,7 @@
   const { verdict } = verdictResult;
   renderVerdict(verdict);
 
-  // ─── Step 7: Store result for popup ───────────────────────────────────────
+  // ─── Step 6: Store result for popup ───────────────────────────────────────
 
   await chrome.storage.local.set({
     currentPageData: {
