@@ -1,7 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(curl -sL \"https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js\" -o \"c:/Users/nwane/OneDrive/Desktop/pricescope/chart.umd.min.js\")"
-    ]
-  }
-}
