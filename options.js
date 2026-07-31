@@ -41,19 +41,15 @@ document.getElementById('test-keepa').addEventListener('click', async () => {
   keepaStatus.textContent = 'Testing…';
   keepaStatus.style.color = '#565959';
 
-  // Temporarily save the key so background.js can use it
-  await chrome.storage.sync.set({ keepaKey: key });
+  // Route through background service worker — hits Keepa directly,
+  // bypassing the cache and demo-mode fallback so the result is honest
+  const result = await chrome.runtime.sendMessage({ type: 'TEST_KEEPA_KEY', key });
 
-  const result = await chrome.runtime.sendMessage({
-    type: 'FETCH_PRICE_DATA',
-    asin: 'B08N5WRWNW' // Echo Dot test ASIN
-  });
-
-  if (result.success) {
+  if (result.ok) {
     keepaStatus.textContent = '✓ Connected';
     keepaStatus.style.color = '#007600';
   } else {
-    keepaStatus.textContent = '✗ Invalid key or network error';
+    keepaStatus.textContent = `✗ Failed (${result.status || result.error || 'network error'})`;
     keepaStatus.style.color = '#c40000';
   }
 });
@@ -71,30 +67,14 @@ document.getElementById('test-claude').addEventListener('click', async () => {
   claudeStatus.textContent = 'Testing…';
   claudeStatus.style.color = '#565959';
 
-  try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': key,
-        'anthropic-version': '2023-06-01'
-      },
-      body: JSON.stringify({
-        model: 'claude-haiku-4-5-20251001',
-        max_tokens: 10,
-        messages: [{ role: 'user', content: 'Reply with the single word: ok' }]
-      })
-    });
+  // Route through background service worker (more reliable in MV3)
+  const result = await chrome.runtime.sendMessage({ type: 'TEST_CLAUDE_KEY', key });
 
-    if (response.ok) {
-      claudeStatus.textContent = '✓ Connected';
-      claudeStatus.style.color = '#007600';
-    } else {
-      claudeStatus.textContent = '✗ Invalid key or network error';
-      claudeStatus.style.color = '#c40000';
-    }
-  } catch (err) {
-    claudeStatus.textContent = '✗ Invalid key or network error';
+  if (result.ok) {
+    claudeStatus.textContent = '✓ Connected';
+    claudeStatus.style.color = '#007600';
+  } else {
+    claudeStatus.textContent = `✗ Failed (${result.status || result.error || 'network error'})`;
     claudeStatus.style.color = '#c40000';
   }
 });
